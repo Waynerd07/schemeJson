@@ -1,0 +1,372 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Unsplash Photo Database",
+    "description": "Read-only access to the Unsplash photo database. Use this API only for searching and retrieving photos.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.unsplash.com"
+    }
+  ],
+  "paths": {
+    "/search/photos": {
+      "get": {
+        "operationId": "searchPhotos",
+        "summary": "Search photos",
+        "description": "Search for photos in the Unsplash database. Use this action whenever the user asks to find or select photos.",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "description": "Photo search query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "description": "Number of photos to return",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 30,
+              "default": 10
+            }
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "required": false,
+            "description": "Sort order",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "relevant",
+                "latest"
+              ],
+              "default": "relevant"
+            }
+          },
+          {
+            "name": "orientation",
+            "in": "query",
+            "required": false,
+            "description": "Photo orientation",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "landscape",
+                "portrait",
+                "squarish"
+              ]
+            }
+          },
+          {
+            "name": "color",
+            "in": "query",
+            "required": false,
+            "description": "Filter photos by color",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "black_and_white",
+                "black",
+                "white",
+                "yellow",
+                "orange",
+                "red",
+                "purple",
+                "magenta",
+                "green",
+                "teal",
+                "blue"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Photo search results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          },
+          "403": {
+            "description": "Access forbidden or rate limit exceeded"
+          }
+        }
+      }
+    },
+    "/photos/random": {
+      "get": {
+        "operationId": "getRandomPhoto",
+        "summary": "Get random photo",
+        "description": "Get a random photo from the Unsplash database, optionally filtered by a search query.",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "description": "Optional topic for the random photo",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "orientation",
+            "in": "query",
+            "required": false,
+            "description": "Photo orientation",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "landscape",
+                "portrait",
+                "squarish"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Random photo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Photo"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          }
+        }
+      }
+    },
+    "/photos/{id}": {
+      "get": {
+        "operationId": "getPhoto",
+        "summary": "Get photo details",
+        "description": "Get detailed information about a specific Unsplash photo by its ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Unsplash photo ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Photo information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Photo"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          },
+          "404": {
+            "description": "Photo not found"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SearchResponse": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer"
+          },
+          "total_pages": {
+            "type": "integer"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Photo"
+            }
+          }
+        }
+      },
+      "Photo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "width": {
+            "type": "integer"
+          },
+          "height": {
+            "type": "integer"
+          },
+          "color": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "alt_description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "likes": {
+            "type": "integer"
+          },
+          "urls": {
+            "$ref": "#/components/schemas/PhotoUrls"
+          },
+          "links": {
+            "$ref": "#/components/schemas/PhotoLinks"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "PhotoUrls": {
+        "type": "object",
+        "properties": {
+          "raw": {
+            "type": "string"
+          },
+          "full": {
+            "type": "string"
+          },
+          "regular": {
+            "type": "string"
+          },
+          "small": {
+            "type": "string"
+          },
+          "thumb": {
+            "type": "string"
+          }
+        }
+      },
+      "PhotoLinks": {
+        "type": "object",
+        "properties": {
+          "self": {
+            "type": "string"
+          },
+          "html": {
+            "type": "string"
+          },
+          "download": {
+            "type": "string"
+          },
+          "download_location": {
+            "type": "string"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "first_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "last_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "links": {
+            "$ref": "#/components/schemas/UserLinks"
+          },
+          "profile_image": {
+            "$ref": "#/components/schemas/ProfileImage"
+          }
+        }
+      },
+      "UserLinks": {
+        "type": "object",
+        "properties": {
+          "self": {
+            "type": "string"
+          },
+          "html": {
+            "type": "string"
+          },
+          "photos": {
+            "type": "string"
+          }
+        }
+      },
+      "ProfileImage": {
+        "type": "object",
+        "properties": {
+          "small": {
+            "type": "string"
+          },
+          "medium": {
+            "type": "string"
+          },
+          "large": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
