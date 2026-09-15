@@ -1,186 +1,115 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Unsplash Photo Database",
-    "description": "Read-only access to the Unsplash photo database. Use this API only for searching and retrieving photos.",
-    "version": "1.0.0"
+    "title": "Spotify Premium GPT API",
+    "description": "Spotify Web API actions for searching music, managing playlists and managing the current user's Spotify library.",
+    "version": "2.0.0"
   },
   "servers": [
     {
-      "url": "https://api.unsplash.com"
+      "url": "https://api.spotify.com/v1"
     }
   ],
   "paths": {
-    "/search/photos": {
+    "/search": {
       "get": {
-        "operationId": "searchPhotos",
-        "summary": "Search photos",
-        "description": "Search for photos in the Unsplash database. Use this action whenever the user asks to find or select photos.",
+        "operationId": "searchSpotify",
+        "summary": "Search Spotify",
+        "description": "Search Spotify for tracks, artists, albums and playlists.",
         "parameters": [
           {
-            "name": "query",
+            "name": "q",
             "in": "query",
             "required": true,
-            "description": "Photo search query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "page",
+            "name": "type",
             "in": "query",
-            "required": false,
-            "description": "Page number",
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "default": 1
-            }
-          },
-          {
-            "name": "per_page",
-            "in": "query",
-            "required": false,
-            "description": "Number of photos to return",
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 30,
-              "default": 10
-            }
-          },
-          {
-            "name": "order_by",
-            "in": "query",
-            "required": false,
-            "description": "Sort order",
+            "required": true,
             "schema": {
               "type": "string",
-              "enum": [
-                "relevant",
-                "latest"
-              ],
-              "default": "relevant"
+              "description": "Spotify search type such as track, artist, album or playlist."
             }
           },
           {
-            "name": "orientation",
+            "name": "market",
             "in": "query",
             "required": false,
-            "description": "Photo orientation",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "landscape",
-                "portrait",
-                "squarish"
-              ]
-            }
-          },
-          {
-            "name": "color",
-            "in": "query",
-            "required": false,
-            "description": "Filter photos by color",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "black_and_white",
-                "black",
-                "white",
-                "yellow",
-                "orange",
-                "red",
-                "purple",
-                "magenta",
-                "green",
-                "teal",
-                "blue"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Photo search results",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SearchResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid request"
-          },
-          "401": {
-            "description": "Invalid or missing API key"
-          },
-          "403": {
-            "description": "Access forbidden or rate limit exceeded"
-          }
-        }
-      }
-    },
-    "/photos/random": {
-      "get": {
-        "operationId": "getRandomPhoto",
-        "summary": "Get random photo",
-        "description": "Get a random photo from the Unsplash database, optionally filtered by a search query.",
-        "parameters": [
-          {
-            "name": "query",
-            "in": "query",
-            "required": false,
-            "description": "Optional topic for the random photo",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "orientation",
+            "name": "limit",
             "in": "query",
             "required": false,
-            "description": "Photo orientation",
             "schema": {
-              "type": "string",
-              "enum": [
-                "landscape",
-                "portrait",
-                "squarish"
-              ]
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10,
+              "default": 5
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Random photo",
+            "description": "Spotify search results",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Photo"
+                  "type": "object",
+                  "properties": {
+                    "tracks": {
+                      "$ref": "#/components/schemas/SearchPage"
+                    },
+                    "artists": {
+                      "$ref": "#/components/schemas/SearchPage"
+                    },
+                    "albums": {
+                      "$ref": "#/components/schemas/SearchPage"
+                    },
+                    "playlists": {
+                      "$ref": "#/components/schemas/SearchPage"
+                    }
+                  }
                 }
               }
             }
-          },
-          "401": {
-            "description": "Invalid or missing API key"
           }
         }
       }
     },
-    "/photos/{id}": {
+
+    "/tracks/{id}": {
       "get": {
-        "operationId": "getPhoto",
-        "summary": "Get photo details",
-        "description": "Get detailed information about a specific Unsplash photo by its ID.",
+        "operationId": "getTrack",
+        "summary": "Get a Spotify track",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "description": "Unsplash photo ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "market",
+            "in": "query",
+            "required": false,
             "schema": {
               "type": "string"
             }
@@ -188,60 +117,796 @@
         ],
         "responses": {
           "200": {
-            "description": "Photo information",
+            "description": "Track information",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Photo"
+                  "$ref": "#/components/schemas/SpotifyItem"
                 }
               }
             }
+          }
+        }
+      }
+    },
+
+    "/artists/{id}": {
+      "get": {
+        "operationId": "getArtist",
+        "summary": "Get a Spotify artist",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Artist information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpotifyItem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/albums/{id}": {
+      "get": {
+        "operationId": "getAlbum",
+        "summary": "Get a Spotify album",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           },
-          "401": {
-            "description": "Invalid or missing API key"
+          {
+            "name": "market",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Album information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpotifyItem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/playlists/{playlist_id}": {
+      "get": {
+        "operationId": "getPlaylist",
+        "summary": "Get a Spotify playlist",
+        "parameters": [
+          {
+            "name": "playlist_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           },
-          "404": {
-            "description": "Photo not found"
+          {
+            "name": "market",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Playlist information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Playlist"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "changePlaylistDetails",
+        "summary": "Rename or edit a playlist",
+        "description": "Change the name, description, visibility or collaborative status of a playlist owned by the current user.",
+        "parameters": [
+          {
+            "name": "playlist_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "public": {
+                    "type": "boolean"
+                  },
+                  "collaborative": {
+                    "type": "boolean"
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Playlist successfully updated"
+          }
+        }
+      }
+    },
+
+    "/playlists/{playlist_id}/items": {
+      "get": {
+        "operationId": "getPlaylistItems",
+        "summary": "Get playlist items",
+        "parameters": [
+          {
+            "name": "playlist_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "market",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Playlist items",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlaylistItemsPage"
+                }
+              }
+            }
+          }
+        }
+      },
+
+      "post": {
+        "operationId": "addItemsToPlaylist",
+        "summary": "Add tracks or episodes to a playlist",
+        "description": "Add Spotify track or episode URIs to a playlist.",
+        "parameters": [
+          {
+            "name": "playlist_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uris": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 100
+                  },
+                  "position": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "uris"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Items added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Snapshot"
+                }
+              }
+            }
+          }
+        }
+      },
+
+      "delete": {
+        "operationId": "removeItemsFromPlaylist",
+        "summary": "Remove tracks or episodes from a playlist",
+        "description": "Remove Spotify items from a playlist using their Spotify URIs.",
+        "parameters": [
+          {
+            "name": "playlist_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "items": {
+                    "type": "array",
+                    "maxItems": 100,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "uri": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "uri"
+                      ]
+                    }
+                  },
+                  "snapshot_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "items"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Items removed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Snapshot"
+                }
+              }
+            }
+          }
+        }
+      },
+
+      "put": {
+        "operationId": "updatePlaylistItems",
+        "summary": "Replace or reorder playlist items",
+        "description": "Replace all playlist items or reorder existing items.",
+        "parameters": [
+          {
+            "name": "playlist_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "uris": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "range_start": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "insert_before": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "range_length": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "snapshot_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Playlist items updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Snapshot"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/me": {
+      "get": {
+        "operationId": "getCurrentUser",
+        "summary": "Get current Spotify user",
+        "responses": {
+          "200": {
+            "description": "Current user profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/me/playlists": {
+      "get": {
+        "operationId": "getMyPlaylists",
+        "summary": "Get current user's playlists",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current user's playlists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlaylistPage"
+                }
+              }
+            }
+          }
+        }
+      },
+
+      "post": {
+        "operationId": "createPlaylist",
+        "summary": "Create a new Spotify playlist",
+        "description": "Create a new playlist for the authenticated Spotify user.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "public": {
+                    "type": "boolean",
+                    "default": true
+                  },
+                  "collaborative": {
+                    "type": "boolean",
+                    "default": false
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Playlist created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Playlist"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/me/tracks": {
+      "get": {
+        "operationId": "getSavedTracks",
+        "summary": "Get saved tracks",
+        "parameters": [
+          {
+            "name": "market",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Saved tracks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedItemsPage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/me/albums": {
+      "get": {
+        "operationId": "getSavedAlbums",
+        "summary": "Get saved albums",
+        "parameters": [
+          {
+            "name": "market",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Saved albums",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedItemsPage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/me/library": {
+      "put": {
+        "operationId": "saveItemsToLibrary",
+        "summary": "Save items to Spotify library",
+        "description": "Save or follow Spotify items using Spotify URIs.",
+        "parameters": [
+          {
+            "name": "uris",
+            "in": "query",
+            "required": true,
+            "description": "Comma-separated Spotify URIs. Maximum 40 items.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Items saved successfully"
+          }
+        }
+      },
+
+      "delete": {
+        "operationId": "removeItemsFromLibrary",
+        "summary": "Remove items from Spotify library",
+        "description": "Remove or unfollow Spotify items using Spotify URIs.",
+        "parameters": [
+          {
+            "name": "uris",
+            "in": "query",
+            "required": true,
+            "description": "Comma-separated Spotify URIs. Maximum 40 items.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Items removed successfully"
           }
         }
       }
     }
   },
+
   "components": {
     "schemas": {
-      "SearchResponse": {
+      "ExternalUrls": {
         "type": "object",
         "properties": {
-          "total": {
-            "type": "integer"
-          },
-          "total_pages": {
-            "type": "integer"
-          },
-          "results": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Photo"
-            }
+          "spotify": {
+            "type": "string"
           }
         }
       },
-      "Photo": {
+
+      "Image": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "height": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "width": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        }
+      },
+
+      "SpotifyItem": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string"
           },
-          "slug": {
+          "name": {
             "type": "string"
           },
-          "width": {
+          "type": {
+            "type": "string"
+          },
+          "uri": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "popularity": {
             "type": "integer"
           },
-          "height": {
+          "duration_ms": {
             "type": "integer"
           },
-          "color": {
+          "explicit": {
+            "type": "boolean"
+          },
+          "release_date": {
+            "type": "string"
+          },
+          "external_urls": {
+            "$ref": "#/components/schemas/ExternalUrls"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Image"
+            }
+          },
+          "artists": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SimpleArtist"
+            }
+          }
+        }
+      },
+
+      "SimpleArtist": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "uri": {
+            "type": "string"
+          },
+          "external_urls": {
+            "$ref": "#/components/schemas/ExternalUrls"
+          }
+        }
+      },
+
+      "SearchPage": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "next": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "previous": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "total": {
+            "type": "integer"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SpotifyItem"
+            }
+          }
+        }
+      },
+
+      "Playlist": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
             "type": "string"
           },
           "description": {
@@ -250,120 +915,227 @@
               "null"
             ]
           },
-          "alt_description": {
+          "public": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "collaborative": {
+            "type": "boolean"
+          },
+          "snapshot_id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "uri": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          },
+          "external_urls": {
+            "$ref": "#/components/schemas/ExternalUrls"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Image"
+            }
+          },
+          "items": {
+            "$ref": "#/components/schemas/PlaylistItemsPage"
+          }
+        }
+      },
+
+      "PlaylistPage": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "next": {
             "type": [
               "string",
               "null"
             ]
           },
-          "likes": {
+          "offset": {
             "type": "integer"
           },
-          "urls": {
-            "$ref": "#/components/schemas/PhotoUrls"
+          "previous": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
-          "links": {
-            "$ref": "#/components/schemas/PhotoLinks"
+          "total": {
+            "type": "integer"
           },
-          "user": {
-            "$ref": "#/components/schemas/User"
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Playlist"
+            }
           }
         }
       },
-      "PhotoUrls": {
+
+      "PlaylistItem": {
         "type": "object",
         "properties": {
-          "raw": {
-            "type": "string"
+          "added_at": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
-          "full": {
-            "type": "string"
+          "is_local": {
+            "type": "boolean"
           },
-          "regular": {
-            "type": "string"
-          },
-          "small": {
-            "type": "string"
-          },
-          "thumb": {
-            "type": "string"
+          "item": {
+            "$ref": "#/components/schemas/SpotifyItem"
           }
         }
       },
-      "PhotoLinks": {
+
+      "PlaylistItemsPage": {
         "type": "object",
         "properties": {
-          "self": {
+          "href": {
             "type": "string"
           },
-          "html": {
+          "limit": {
+            "type": "integer"
+          },
+          "next": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "previous": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "total": {
+            "type": "integer"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlaylistItem"
+            }
+          }
+        }
+      },
+
+      "SavedItem": {
+        "type": "object",
+        "properties": {
+          "added_at": {
             "type": "string"
           },
-          "download": {
+          "track": {
+            "$ref": "#/components/schemas/SpotifyItem"
+          },
+          "album": {
+            "$ref": "#/components/schemas/SpotifyItem"
+          }
+        }
+      },
+
+      "SavedItemsPage": {
+        "type": "object",
+        "properties": {
+          "href": {
             "type": "string"
           },
-          "download_location": {
+          "limit": {
+            "type": "integer"
+          },
+          "next": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "previous": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "total": {
+            "type": "integer"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SavedItem"
+            }
+          }
+        }
+      },
+
+      "Snapshot": {
+        "type": "object",
+        "properties": {
+          "snapshot_id": {
             "type": "string"
           }
         }
       },
+
       "User": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string"
           },
-          "username": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "first_name": {
+          "display_name": {
             "type": [
               "string",
               "null"
             ]
           },
-          "last_name": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "links": {
-            "$ref": "#/components/schemas/UserLinks"
-          },
-          "profile_image": {
-            "$ref": "#/components/schemas/ProfileImage"
-          }
-        }
-      },
-      "UserLinks": {
-        "type": "object",
-        "properties": {
-          "self": {
+          "country": {
             "type": "string"
           },
-          "html": {
+          "email": {
             "type": "string"
           },
-          "photos": {
-            "type": "string"
-          }
-        }
-      },
-      "ProfileImage": {
-        "type": "object",
-        "properties": {
-          "small": {
+          "product": {
             "type": "string"
           },
-          "medium": {
+          "type": {
             "type": "string"
           },
-          "large": {
+          "uri": {
             "type": "string"
+          },
+          "external_urls": {
+            "$ref": "#/components/schemas/ExternalUrls"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Image"
+            }
           }
         }
       }
